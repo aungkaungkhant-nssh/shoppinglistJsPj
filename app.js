@@ -13,7 +13,8 @@ const productDom=document.querySelector('.products-center');
 
 //cart
 let cart=[];
- 
+//buttonDom
+let buttonDom=[]
 //getting products
 class Products{
     async getProducts(){
@@ -50,7 +51,8 @@ class UI{
         productDom.innerHTML=text
     }
     getBagButtons(){
-        const btns=[...document.querySelectorAll('.bag-btn')];
+        let btns=[...document.querySelectorAll('.bag-btn')];
+        buttonDom=[...btns];
         btns.forEach(btn =>{
             let id=btn.dataset.id;
             let inCart=cart.find(item => item.id==id);
@@ -120,9 +122,43 @@ class UI{
         this.populateCart(cart);
         cartBtn.addEventListener("click",this.showCart)
         closeCartBtn.addEventListener("click",this.hideCart)
+        
     }
     populateCart(cart){
         cart.map(c =>this.addCartItem(c))
+    }
+    cartLogic(){
+        ///clear cart
+        clearCartBtn.addEventListener("click",()=>{
+            this.clearCart()
+        })
+        /// clear functionality
+        cartContent.addEventListener("click",event=>{
+            if(event.target.classList.contains("remove-item")){
+               let id=event.target.dataset.id;
+               this.removeCart(id);
+               cartContent.removeChild(event.target.parentElement.parentElement)
+            }
+        })
+    }
+    clearCart(){
+        let cartItems=cart.map(item =>item.id)
+        cartItems.forEach(id => this.removeCart(id))
+        if(cartContent.children.length>0){
+            cartContent.removeChild(cartContent.children[1])
+        }
+        this.hideCart()
+    }
+    removeCart(id){
+        cart=cart.filter(item =>item.id!==id);
+        Storage.saveCart(cart);
+        this.setCartValues(cart);
+        let button=this.singleButton(id);
+        button.disabled=false;
+        button.innerHTML=` <i class="fas fa-shopping-cart">add to bag</i>`
+    }
+    singleButton(id){
+        return buttonDom.find(btn =>btn.dataset.id===id)
     }
 }
  //localstorage
@@ -152,5 +188,6 @@ document.addEventListener("DOMContentLoaded",()=>{
         })
         .then(()=>{
             ui.getBagButtons()
+            ui.cartLogic()
         })
 })
