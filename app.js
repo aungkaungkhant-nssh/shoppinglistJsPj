@@ -138,6 +138,29 @@ class UI{
                let id=event.target.dataset.id;
                this.removeCart(id);
                cartContent.removeChild(event.target.parentElement.parentElement)
+            }else if(event.target.classList.contains("fa-chevron-up")){
+                let addMount=event.target
+                let id=addMount.dataset.id;
+                let cartAmount=cart.find(item =>item.id===id);
+                cartAmount.amount=cartAmount.amount+1;
+                Storage.saveCart(cart)
+                this.setCartValues(cart)
+                addMount.nextElementSibling.innerText= cartAmount.amount
+                
+            }else if(event.target.classList.contains("fa-chevron-down")){
+                let lowAmount=event.target;
+                let id=lowAmount.dataset.id;
+                let cartAmount=cart.find(item =>item.id===id);
+                cartAmount.amount=cartAmount.amount-1;
+                if(cartAmount.amount>0){
+                    Storage.saveCart(cart)
+                    this.setCartValues(cart)
+                    lowAmount.previousElementSibling.innerText= cartAmount.amount;
+                  
+                }else{
+                    cartContent.removeChild(lowAmount.parentElement.parentElement);
+                    this.removeCart(id);
+                }
             }
         })
     }
